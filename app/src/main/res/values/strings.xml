@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">FinkiCodelab</string>
+    <string name="full_name_hint">Enter your name</string>
+    <string name="age_hint">Enter age</string>
+    <string name="email_hint">Enter e-mail</string>
+    <string name="preparation_time_hint">Enter preparation time</string>
+    <string name="take_photo">Take photo</string>
+    <string name="title_activity_main2">MainActivity2</string>
+    <string name="title_home">Home</string>
+    <string name="title_trending">Trending</string>
+    <string name="title_profile">Profile</string>
+    <string name="search_hint">Search for a recipe</string>
+    <string name="genres_title">Which genres do you like?</string>
+    <string name="add_genre">Add genre</string>
+    <string name="save_profile">Save profile</string>
+    <string name="profile_save_succes_mesage">Profile saved</string>
+    <string name="profile_save_error_message">Something went wrong!</string>
+    <string name="home_update_preferences">Please go to the Profile screen and update you genre preferences.</string>
+    <string name="home_hello_message">Hello %s, here are some suggestions for you!</string>
+</resources>
