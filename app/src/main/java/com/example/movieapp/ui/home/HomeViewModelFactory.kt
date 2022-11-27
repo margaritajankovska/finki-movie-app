@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.movieapp.data.movie.retrofit.MovieDbApiProvider
+import com.example.movieapp.data.movie.retrofit.RetrofitMovieDataSource
 import com.example.movieapp.data.movie.room.AppDatabase
+import com.example.movieapp.data.movie.room.RoomMovieDataSource
 import com.example.movieapp.data.profile.ProfileStore
 import com.example.movieapp.domain.movie.MovieRepository
 import com.example.movieapp.domain.profile.ProfileRepository
@@ -23,8 +25,8 @@ class HomeViewModelFactory(private val context: Context) : ViewModelProvider.Fac
                 ProfileRepository(ProfileStore.getProfileStore(context)),
                 MovieRepository(
                     NetworkConnectivity(context),
-                    MovieDbApiProvider.getMovieDbApi(),
-                    AppDatabase.getDatabase(context).movieDao()
+                    RetrofitMovieDataSource(MovieDbApiProvider.getMovieDbApi()),
+                    RoomMovieDataSource(AppDatabase.getDatabase(context).movieDao())
                 ),
                 Dispatchers.IO
             )

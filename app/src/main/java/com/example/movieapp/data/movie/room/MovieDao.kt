@@ -22,5 +22,4 @@ interface MovieDao {
                 "WHERE title LIKE '%' || :query || '%' "
     )
     fun searchMovies(query: String): List<Movie>
-
 }
