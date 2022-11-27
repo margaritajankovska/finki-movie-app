@@ -4,20 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.movieapp.data.movie.retrofit.MovieDbApi
-import com.example.movieapp.data.movie.room.MovieDao
-import com.example.movieapp.data.profile.ProfileStore
+import com.example.movieapp.domain.movie.MovieRepository
 import com.example.movieapp.domain.movie.model.Movie
+import com.example.movieapp.domain.profile.ProfileRepository
 import com.example.movieapp.domain.profile.model.Profile
-import com.example.movieapp.util.NetworkConnectivity
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val movieDbApi: MovieDbApi,
-    private val movieDao: MovieDao,
-    private val profileStore: ProfileStore,
-    private val networkConnectivity: NetworkConnectivity,
+    private val profileRepository: ProfileRepository,
+    private val movieRepository: MovieRepository,
     private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -35,44 +32,11 @@ class HomeViewModel(
 
     private fun initializeData() {
         viewModelScope.launch(ioDispatcher) {
-            val profile = profileStore.getProfile()?.apply { profileLiveData.postValue(this) }
-
-            if (networkConnectivity.isNetworkAvailable) {
-                if (!profile?.genres.isNullOrEmpty()) {
-                    moviesLiveData.postValue(getMoviesByGenres(profile!!.genres))
-                }
-            } else {
-                moviesLiveData.postValue(movieDao.getAll())
+            val profile = profileRepository.getProfile()
+            profileLiveData.postValue(profile)
+            if (profile.genres.isNotEmpty()) {
+                moviesLiveData.postValue(movieRepository.getMoviesByGenres(profile.genres))
             }
-        }
-    }
-
-    private suspend fun getMoviesByGenres(genres: List<String>): List<Movie> {
-        val movieResponse = movieDbApi.getByGenres(getGenreIdsFromGenreStrings(genres))
-        if (movieResponse.isSuccessful) {
-            val results = movieResponse.body()!!.results
-            for (result in results) {
-                movieDao.insert(result)
-            }
-            return results
-        }
-
-        return movieDao.getAll()
-    }
-
-    private suspend fun getGenreIdsFromGenreStrings(genres: List<String>): String {
-        val genreIds = ArrayList<Int>()
-        val genresResponse = movieDbApi.getGenres()
-        for (genre in genres) {
-            for (movieDbGenre in genresResponse.body()!!.genres) {
-                if (movieDbGenre.name.equals(genre, ignoreCase = true)) {
-                    genreIds.add(movieDbGenre.id)
-                    break
-                }
-            }
-        }
-        return genreIds.joinToString(",") {
-            it.toString()
         }
     }
 }
