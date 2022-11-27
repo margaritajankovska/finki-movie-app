@@ -1,24 +1,34 @@
 package com.example.movieapp.ui.home
 
 import android.content.Context
+import android.net.Network
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.movieapp.data.movie.retrofit.MovieDbApi
 import com.example.movieapp.data.movie.retrofit.MovieDbApiProvider
 import com.example.movieapp.data.movie.room.AppDatabase
+import com.example.movieapp.data.movie.room.MovieDao
 import com.example.movieapp.data.profile.ProfileStore
-import com.example.movieapp.domain.movie.MovieRepository
-import com.example.movieapp.domain.profile.ProfileRepository
 import com.example.movieapp.util.NetworkConnectivity
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 
 class HomeViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return modelClass.getConstructor(ProfileRepository::class.java, MovieRepository::class.java)
+        return modelClass.getConstructor(
+            MovieDbApi::class.java,
+            MovieDao::class.java,
+            ProfileStore::class.java,
+            NetworkConnectivity::class.java,
+            CoroutineDispatcher::class.java
+        )
             .newInstance(
-                ProfileRepository(ProfileStore.getProfileStore(context)), MovieRepository(
-                    NetworkConnectivity(context),
-                    MovieDbApiProvider.getMovieDbApi(),
-                    AppDatabase.getDatabase(context).movieDao()
-                )
+                MovieDbApiProvider.getMovieDbApi(),
+                AppDatabase.getDatabase(context).movieDao(),
+                ProfileStore.getProfileStore(context),
+                NetworkConnectivity(context),
+                Dispatchers.IO
+
             )
     }
 }
